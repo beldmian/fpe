@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/fpe/poker-engine/schemas/strategy-output.json",
+  "title": "GTO Strategy Output",
+  "description": "Output schema for fpe analyze command with --json flag",
+  "type": "object",
+  "required": ["input", "strategy", "solver"],
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "type": "object",
+      "description": "Input parameters used for analysis",
+      "required": ["hero", "villain_range", "villain_combos", "pot", "stack", "to_call", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "hero": {
+          "type": "string",
+          "description": "Hero's hole cards in notation (e.g., AhKd)",
+          "pattern": "^[2-9TJQKA][hdcs][2-9TJQKA][hdcs]$"
+        },
+        "board": {
+          "type": "string",
+          "description": "Community cards (empty for preflop)",
+          "pattern": "^([2-9TJQKA][hdcs]){0,5}$"
+        },
+        "villain_range": {
+          "type": "string",
+          "description": "Original range notation provided"
+        },
+        "villain_combos": {
+          "type": "integer",
+          "description": "Number of hand combinations in villain range",
+          "minimum": 1
+        },
+        "pot": {
+          "type": "number",
+          "description": "Pot size in big blinds",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "stack": {
+          "type": "number",
+          "description": "Effective stack size in big blinds",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "to_call": {
+          "type": "number",
+          "description": "Amount hero needs to call in big blinds",
+          "minimum": 0
+        },
+        "position": {
+          "type": "string",
+          "description": "Hero's position",
+          "enum": ["IP", "OOP"]
+        }
+      }
+    },
+    "strategy": {
+      "type": "array",
+      "description": "GTO strategy showing action frequencies and EVs",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "action_display", "frequency", "ev"],
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Machine-readable action identifier",
+            "enum": [
+              "fold",
+              "check",
+              "call",
+              "bet_33_pot",
+              "bet_50_pot",
+              "bet_75_pot",
+              "bet_100_pot",
+              "raise_min",
+              "raise_50_pot",
+              "raise_pot",
+              "all_in"
+            ]
+          },
+          "action_display": {
+            "type": "string",
+            "description": "Human-readable action name"
+          },
+          "frequency": {
+            "type": "number",
+            "description": "Frequency to take this action (0.0-1.0)",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "ev": {
+            "type": "number",
+            "description": "Expected value of this action in big blinds"
+          }
+        }
+      }
+    },
+    "solver": {
+      "type": "object",
+      "description": "Solver metadata",
+      "required": ["iterations", "convergence"],
+      "additionalProperties": false,
+      "properties": {
+        "iterations": {
+          "type": "integer",
+          "description": "Number of CFR iterations performed",
+          "minimum": 1
+        },
+        "convergence": {
+          "type": "number",
+          "description": "Convergence metric (Nash distance approximation)",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

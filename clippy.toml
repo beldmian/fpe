@@ -1,0 +1,10 @@
+# Clippy configuration for strict linting per constitution
+
+# Warn on common mistakes
+cognitive-complexity-threshold = 10
+
+# Enforce documentation
+missing-docs-in-crate-items = false
+
+# Style preferences
+max-fn-params-bools = 3
