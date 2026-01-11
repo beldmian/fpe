@@ -3,7 +3,9 @@
 use crate::error::Result;
 use crate::models::action::{Action, BetSize};
 use crate::models::game_state::GameState;
-use crate::models::strategy::{ActionStrategy, Strategy};
+use crate::models::strategy::Strategy;
+
+use crate::solver::mccfr::solve_mccfr;
 
 /// GTO Solver engine
 pub struct Solver {
@@ -23,30 +25,15 @@ impl Solver {
     /// Execute the solver and return the strategy
     pub fn solve(&self) -> Result<Strategy> {
         // 1. Determine available actions (if not already set in game_state)
-        let actions = if self.game_state.available_actions.is_empty() {
-            determine_available_actions(&self.game_state)
-        } else {
-            self.game_state.available_actions.clone()
-        };
+        let mut state = self.game_state.clone();
+        if state.available_actions.is_empty() {
+            state.available_actions = determine_available_actions(&state);
+        }
 
-        // 2. Initialize strategy (uniform stub)
-        let n_actions = actions.len();
-        let uniform = if n_actions > 0 {
-            1.0 / n_actions as f64
-        } else {
-            0.0
-        };
+        // 2. Run MCCFR
+        let strategy = solve_mccfr(&state, self.iterations);
 
-        let action_strategies: Vec<ActionStrategy> = actions
-            .into_iter()
-            .map(|a| ActionStrategy {
-                action: a,
-                frequency: uniform,
-                ev: 0.0,
-            })
-            .collect();
-
-        Ok(Strategy::new(action_strategies, self.iterations, 0.0))
+        Ok(strategy)
     }
 }
 

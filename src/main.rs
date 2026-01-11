@@ -91,7 +91,7 @@ fn main() {
             let mut board_cards = Vec::new();
             if !board.is_empty() {
                 let chars: Vec<char> = board.chars().collect();
-                if chars.len() % 2 != 0 {
+                if !chars.len().is_multiple_of(2) {
                     eprintln!("Error: Board string length must be even");
                     std::process::exit(1);
                 }
